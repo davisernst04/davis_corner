@@ -1,1 +1,1 @@
-# Project Tracks\n\nThis file tracks all major tracks for the project. Each track has its own detailed plan in its respective folder.\n\n---\n\n- [ ] **Track: Implement Search and Tagging for Blog Posts**\n  *Link: [./tracks/search_tagging_20260303/](./tracks/search_tagging_20260303/)*
+# Project Tracks\n\nThis file tracks all major tracks for the project. Each track has its own detailed plan in its respective folder.\n\n---\n\n- [x] **Track: Implement Search and Tagging for Blog Posts**\n  *Link: [./tracks/search_tagging_20260303/](./tracks/search_tagging_20260303/)*
