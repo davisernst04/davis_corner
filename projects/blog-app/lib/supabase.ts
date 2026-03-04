@@ -8,7 +8,7 @@ export const supabase = createBrowserClient(
 export async function searchPosts(query: string) {
   const { data, error } = await supabase
     .from('blog_posts')
-    .select('id, title, slug, excerpt, created_at, published')
+    .select('id, title, slug, excerpt, created_at, published, post_tags(tags(name))')
     .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%,content.ilike.%${query}%`)
     .eq('published', true)
     .order('created_at', { ascending: false })
