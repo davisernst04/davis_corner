@@ -9,7 +9,7 @@
 | Vendasta | Software Developer Intern / Implementation Engineer | https://www.vendasta.com/company/careers/ |
 | 7shifts | Junior Software Developer / Engineering Intern | https://www.7shifts.com/careers |
 | Calian (Advanced Tech) | Software Engineering Student/Intern | https://careers.calian.com/students |
-| University of SaskatchewanUSRA | CS Research Assistant (USRA) | https://careerlink.usask.ca |
+| University of Saskatchewan USRA | CS Research Assistant (USRA) | https://careerlink.usask.ca |
 
 ## Remote (Canada-Wide)
 
@@ -35,5 +35,5 @@
 
 ## Notes
 
-- Update: Many big-tech/institution postings closed; prioritize Saskatoon local and rolling remote postings.
-- Vendasta/7shifts are strong Saskatoon-native options.
+- Prioritize Saskatoon local and rolling remote postings.
+- Vendasta and 7shifts are strong Saskatoon-native options.
