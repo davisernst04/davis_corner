@@ -37,6 +37,16 @@ export async function getPostsByTag(tagId: string) {
   return data
 }
 
+export async function getPostTags(postId: string) {
+  const { data, error } = await supabase
+    .from('post_tags')
+    .select('*, tags(*)')
+    .eq('post_id', postId)
+
+  if (error) throw error
+  return data?.map(pt => pt.tags) || []
+}
+
 export async function addTagToPost(postId: string, tagName: string) {
   // 1. Get or create tag
   let { data: tag, error: tagError } = await supabase
