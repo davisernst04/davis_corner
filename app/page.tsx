@@ -6,8 +6,6 @@ import { supabase, searchPosts, getTags } from '@/lib/supabase'
 import Search from '@/components/Search'
 import TagList from '@/components/TagList'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 
 interface BlogPost {

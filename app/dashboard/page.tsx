@@ -81,54 +81,54 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Your Posts</h1>
-          <p className="text-muted-foreground mt-1">Manage and publish your blog posts.</p>
+        <div className="space-y-1">
+          <h1 className="text-4xl font-bold tracking-tight italic">The Archives</h1>
+          <p className="text-muted-foreground italic">Managing the collection of thoughts.</p>
         </div>
         <Link href="/dashboard/new">
-          <Button className="shadow-sm">
+          <Button className="font-bold">
             <Plus className="mr-2 h-4 w-4" />
-            New Post
+            New Entry
           </Button>
         </Link>
       </div>
 
-      <Card>
+      <Card className="border-border bg-card shadow-sm overflow-hidden">
         <CardHeader className="p-0"></CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="p-8 text-center text-muted-foreground">Loading posts...</div>
+            <div className="p-12 text-center text-muted-foreground italic">Consulting the records...</div>
           ) : posts.length === 0 ? (
-            <div className="text-center py-24">
-              <p className="text-muted-foreground mb-4">You haven't created any posts yet.</p>
+            <div className="text-center py-24 space-y-4">
+              <p className="text-muted-foreground italic">The chronicles are currently empty.</p>
               <Link href="/dashboard/new">
-                <Button variant="outline">Create your first post</Button>
+                <Button variant="outline" className="font-bold">Start writing</Button>
               </Link>
             </div>
           ) : (
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[40%]">Post</TableHead>
-                  <TableHead>Tags</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+              <TableHeader className="bg-muted/50">
+                <TableRow className="border-border">
+                  <TableHead className="w-[40%] font-bold uppercase tracking-widest text-[10px]">Title</TableHead>
+                  <TableHead className="font-bold uppercase tracking-widest text-[10px]">Tags</TableHead>
+                  <TableHead className="font-bold uppercase tracking-widest text-[10px]">Status</TableHead>
+                  <TableHead className="font-bold uppercase tracking-widest text-[10px]">Date</TableHead>
+                  <TableHead className="text-right font-bold uppercase tracking-widest text-[10px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {posts.map((post) => (
-                  <TableRow key={post.id}>
+                  <TableRow key={post.id} className="border-border hover:bg-muted/30">
                     <TableCell>
-                      <div>
-                        <div className="font-semibold text-slate-900 line-clamp-1">
+                      <div className="space-y-1">
+                        <div className="font-bold text-foreground">
                           {post.title}
                         </div>
-                        <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                          <Link href={`/blog/${post.slug}`} target="_blank" className="hover:underline flex items-center">
-                            /{post.slug} <ExternalLink className="ml-1 h-3 w-3" />
+                        <div className="text-[10px] text-muted-foreground flex items-center gap-1 font-mono">
+                          <Link href={`/blog/${post.slug}`} target="_blank" className="hover:text-primary flex items-center transition-colors">
+                            /{post.slug} <ExternalLink className="ml-1 h-3 w-3 opacity-50" />
                           </Link>
                         </div>
                       </div>
@@ -136,62 +136,66 @@ export default function Dashboard() {
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {post.post_tags?.map(({ tags }) => (
-                          <Badge
+                          <span
                             key={tags.name}
-                            variant="secondary"
-                            className="px-1.5 py-0 text-[10px] font-medium"
+                            className="text-[9px] font-bold uppercase tracking-widest text-primary/70 bg-primary/5 px-2 py-0.5 rounded"
                           >
                             {tags.name}
-                          </Badge>
+                          </span>
                         ))}
                         {(!post.post_tags || post.post_tags.length === 0) && (
-                          <span className="text-xs text-muted-foreground italic">None</span>
+                          <span className="text-[10px] text-muted-foreground/50 italic">None</span>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={post.published ? 'default' : 'outline'}
-                        className={post.published ? 'bg-emerald-500 hover:bg-emerald-600' : 'text-amber-600 border-amber-200'}
-                      >
+                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${
+                        post.published 
+                          ? 'text-emerald-600 bg-emerald-500/10' 
+                          : 'text-amber-600 bg-amber-500/10'
+                      }`}>
                         {post.published ? 'Published' : 'Draft'}
-                      </Badge>
+                      </span>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                      {new Date(post.created_at).toLocaleDateString()}
+                    <TableCell className="text-[11px] text-muted-foreground font-bold whitespace-nowrap">
+                      {new Date(post.created_at).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10 hover:text-primary">
                             <MoreVertical className="h-4 w-4" />
                             <span className="sr-only">Open menu</span>
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="bg-card border-border">
                           <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/edit/${post.id}`} className="flex items-center cursor-pointer">
-                              <Edit2 className="mr-2 h-4 w-4" />
+                            <Link href={`/dashboard/edit/${post.id}`} className="flex items-center cursor-pointer font-bold text-xs uppercase tracking-widest">
+                              <Edit2 className="mr-2 h-3 w-3" />
                               Edit
                             </Link>
                           </DropdownMenuItem>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
-                                <Trash2 className="mr-2 h-4 w-4" />
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer font-bold text-xs uppercase tracking-widest">
+                                <Trash2 className="mr-2 h-3 w-3" />
                                 Delete
                               </DropdownMenuItem>
                             </AlertDialogTrigger>
-                            <AlertDialogContent>
+                            <AlertDialogContent className="bg-card border-border">
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This will permanently delete "{post.title}". This action cannot be undone.
+                                <AlertDialogTitle className="italic">Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription className="font-serif">
+                                  This will permanently remove "{post.title}" from the archives. This action cannot be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deletePost(post.id)} className="bg-red-600 hover:bg-red-700">
+                                <AlertDialogCancel className="font-bold text-xs uppercase tracking-widest">Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deletePost(post.id)} className="bg-destructive hover:bg-destructive/90 font-bold text-xs uppercase tracking-widest">
                                   Delete
                                 </AlertDialogAction>
                               </AlertDialogFooter>

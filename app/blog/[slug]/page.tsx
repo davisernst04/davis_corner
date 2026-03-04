@@ -7,8 +7,8 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { ArrowLeft, Calendar, Loader2 } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
 
 interface BlogPost {
   id: string
@@ -49,10 +49,10 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Reading post...</p>
+          <p className="text-muted-foreground italic font-serif">Unrolling the parchment...</p>
         </div>
       </div>
     )
@@ -60,22 +60,22 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        <header className="border-b bg-white shadow-sm">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="min-h-screen">
+        <header className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
+          <div className="max-w-3xl mx-auto px-6 py-6">
             <Link href="/">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="font-bold">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
+                Back to Archives
               </Button>
             </Link>
           </div>
         </header>
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">{error || 'Post not found'}</h1>
-          <p className="text-muted-foreground mb-8">The post you are looking for might have been moved or deleted.</p>
+        <main className="max-w-3xl mx-auto px-6 py-24 text-center space-y-4">
+          <h1 className="text-3xl font-bold italic">{error || 'Post not found'}</h1>
+          <p className="text-muted-foreground font-serif">The requested entry has been lost to time or never existed.</p>
           <Link href="/">
-            <Button>Return to Blog</Button>
+            <Button className="font-bold">Return to Blog</Button>
           </Link>
         </main>
       </div>
@@ -83,23 +83,32 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24">
+    <div className="min-h-screen pb-24">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center gap-4 mb-6">
+      <header className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-3xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between">
             <Link href="/">
-              <Button variant="ghost" size="sm" className="-ml-2">
+              <Button variant="ghost" size="sm" className="-ml-2 font-bold text-primary">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Blog
               </Button>
             </Link>
+            <ThemeToggle />
           </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-6">{post.title}</h1>
-          <div className="flex items-center text-muted-foreground gap-2 font-medium uppercase tracking-wider text-xs">
-            <Calendar className="h-4 w-4" />
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <div className="max-w-3xl mx-auto px-6 pt-16 pb-8 text-center border-b border-border/50">
+        <div className="space-y-6">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight italic">
+            {post.title}
+          </h1>
+          <div className="flex items-center justify-center text-muted-foreground gap-3 font-bold uppercase tracking-[0.2em] text-[10px]">
+            <Calendar className="h-3 w-3" />
             <time>
-              {new Date(post.created_at).toLocaleDateString('en-US', {
+              {new Date(post.created_at).toLocaleDateString(undefined, {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
@@ -107,20 +116,24 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
             </time>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Card className="border-none shadow-none bg-transparent">
-          <CardContent className="p-0">
-            <article className="prose prose-slate prose-lg max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {post.content}
-              </ReactMarkdown>
-            </article>
-          </CardContent>
-        </Card>
+      <main className="max-w-3xl mx-auto px-6 py-12">
+        <article className="prose prose-earth dark:prose-invert max-w-none font-serif">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {post.content}
+          </ReactMarkdown>
+        </article>
       </main>
+
+      <footer className="max-w-3xl mx-auto px-6 mt-20 text-center">
+        <div className="border-t border-border pt-12">
+          <p className="text-xs uppercase tracking-[0.3em] font-bold text-muted-foreground/40">
+            End of entry
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }
