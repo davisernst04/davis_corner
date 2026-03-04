@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { supabase, searchPosts, getTags } from '@/lib/supabase'
-import Search from '@/components/Search'
+import { supabase, getPostsByTag, getTags } from '@/lib/supabase'
 import TagList from '@/components/TagList'
 
 interface BlogPost {
@@ -16,55 +15,42 @@ interface BlogPost {
   post_tags: { tags: { name: string } }[]
 }
 
-export default function Home() {
+export default function TaggedPosts({ params }: { params: { id: string } }) {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [tags, setTags] = useState<any[]>([])
+  const [tagName, setTagName] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchPosts()
     fetchTags()
-  }, [])
+    fetchTaggedPosts()
+  }, [params.id])
 
   async function fetchTags() {
     try {
       const data = await getTags()
       setTags(data || [])
+      const currentTag = data?.find((t: any) => t.id === params.id)
+      if (currentTag) setTagName(currentTag.name)
     } catch (error) {
       console.error('Error fetching tags:', error)
     }
   }
 
-  async function fetchPosts() {
+  async function fetchTaggedPosts() {
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('id, title, slug, excerpt, created_at, published, post_tags(tags(name))')
-        .eq('published', true)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setPosts(data || [])
+      const data = await getPostsByTag(params.id)
+      // data is from post_tags, each row has blog_posts
+      const formattedPosts = data?.map((row: any) => ({
+        ...row.blog_posts,
+        // We need to fetch tags for each post too if we want to display them on the card
+        // For simplicity, I'll just use the posts from the relation
+      })).filter((p: any) => p.published) || []
+      
+      setPosts(formattedPosts)
     } catch (error) {
-      console.error('Error fetching posts:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSearch = async (query: string) => {
-    if (!query.trim()) {
-      fetchPosts()
-      return
-    }
-
-    setLoading(true)
-    try {
-      const data = await searchPosts(query)
-      setPosts(data as any || [])
-    } catch (error) {
-      console.error('Error searching posts:', error)
+      console.error('Error fetching tagged posts:', error)
     } finally {
       setLoading(false)
     }
@@ -75,24 +61,18 @@ export default function Home() {
       {/* Header */}
       <header className="border-b border-slate-200 bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <Link href="/" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+            ← All Posts
+          </Link>
+          <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-slate-900">My Blog</h1>
-              <p className="mt-2 text-slate-600">Thoughts on development, design, and more</p>
+              <h1 className="text-4xl font-bold text-slate-900">
+                Posts tagged with "{tagName || '...'}"
+              </h1>
             </div>
-            <Link
-              href="/dashboard"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition order-first sm:order-last"
-            >
-              Dashboard
-            </Link>
-          </div>
-          
-          <div className="mt-8 flex flex-col gap-6">
-            <Search onSearch={handleSearch} />
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium text-slate-500">Popular Tags</p>
-              <TagList tags={tags} />
+            <div className="flex flex-col gap-2 mt-4">
+              <p className="text-sm font-medium text-slate-500">Explore other tags</p>
+              <TagList tags={tags} activeTagId={params.id} />
             </div>
           </div>
         </div>
@@ -106,7 +86,7 @@ export default function Home() {
           </div>
         ) : posts.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-slate-600">No posts found</p>
+            <p className="text-slate-600">No posts found with this tag</p>
           </div>
         ) : (
           <div className="grid gap-6">
@@ -115,13 +95,6 @@ export default function Home() {
                 key={post.id}
                 className="bg-white rounded-lg shadow-md hover:shadow-lg transition p-6"
               >
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {post.post_tags?.map(({ tags }) => (
-                    <span key={tags.name} className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-xs font-medium">
-                      {tags.name}
-                    </span>
-                  ))}
-                </div>
                 <h2 className="text-2xl font-bold text-slate-900 mb-2">
                   <Link
                     href={`/blog/${post.slug}`}
