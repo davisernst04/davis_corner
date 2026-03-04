@@ -6,4 +6,9 @@
     - [x] Write tests for tag selection UI and logic
     - [x] Implement tag input/selection in /dashboard/new and /dashboard/edit\n- [x] Task: Display Tags in Post Management List (40b9477)
     - [ ] Write tests for tag display in the dashboard list
-    - [x] Update /dashboard post listing UI\n- [x] Task: Conductor - User Manual Verification 'Phase 2: Admin Dashboard Integration' (Protocol in workflow.md) (bf1c345)\n\n## Phase 3: Public UI Integration\n- [ ] Task: Add Search Functionality to Homepage\n    - [ ] Write tests for search bar and result filtering\n    - [ ] Implement search bar and logic in app/page.tsx\n- [ ] Task: Implement Tag Filtering and Display\n    - [ ] Write tests for tag filtering logic\n    - [ ] Display tags on post cards and post pages\n    - [ ] Implement tag-specific filtered views\n- [ ] Task: Conductor - User Manual Verification 'Phase 3: Public UI Integration' (Protocol in workflow.md)
+    - [x] Update /dashboard post listing UI\n- [x] Task: Conductor - User Manual Verification 'Phase 2: Admin Dashboard Integration' (Protocol in workflow.md) (bf1c345)\n\n## Phase 3: Public UI Integration [checkpoint: e2b925a]\n- [x] Task: Add Search Functionality to Homepage (068fbcb)
+    - [x] Write tests for search bar and result filtering
+    - [x] Implement search bar and logic in app/page.tsx\n- [x] Task: Implement Tag Filtering and Display (f4bbf61)
+    - [x] Write tests for tag filtering logic
+    - [x] Display tags on post cards and post pages
+    - [x] Implement tag-specific filtered views\n- [x] Task: Conductor - User Manual Verification 'Phase 3: Public UI Integration' (Protocol in workflow.md) (e2b925a)
