@@ -71,6 +71,7 @@ export async function addTagToPost(postId: string, tagName: string) {
   }
 
   // 2. Link tag to post
+  if (!tag) throw new Error('Failed to get or create tag')
   const { error: linkError } = await supabase
     .from('post_tags')
     .insert({ post_id: postId, tag_id: tag.id })

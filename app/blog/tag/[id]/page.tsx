@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { supabase, getPostsByTag, getTags } from '@/lib/supabase'
+import { getPostsByTag, getTags } from '@/lib/supabase'
 import TagList from '@/components/TagList'
 
 interface BlogPost {
@@ -24,6 +24,7 @@ export default function TaggedPosts({ params }: { params: { id: string } }) {
   useEffect(() => {
     fetchTags()
     fetchTaggedPosts()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id])
 
   async function fetchTags() {
@@ -67,7 +68,7 @@ export default function TaggedPosts({ params }: { params: { id: string } }) {
           <div className="flex flex-col gap-4">
             <div>
               <h1 className="text-4xl font-bold text-slate-900">
-                Posts tagged with "{tagName || '...'}"
+                Posts tagged with &quot;{tagName || '...'}&quot;
               </h1>
             </div>
             <div className="flex flex-col gap-2 mt-4">

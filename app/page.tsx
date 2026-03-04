@@ -45,7 +45,7 @@ export default function Home() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setPosts(data || [])
+      setPosts((data as unknown as BlogPost[]) || [])
     } catch (error) {
       console.error('Error fetching posts:', error)
     } finally {
