@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Badge } from '@/components/ui/badge'
 
 interface Tag {
   id: string
@@ -18,16 +19,13 @@ export default function TagList({ tags, activeTagId }: TagListProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {tags.map((tag) => (
-        <Link
-          key={tag.id}
-          href={`/blog/tag/${tag.id}`}
-          className={`px-3 py-1 rounded-full text-sm font-medium transition ${
-            activeTagId === tag.id
-              ? 'bg-blue-600 text-white'
-              : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-400 hover:text-blue-600'
-          }`}
-        >
-          {tag.name}
+        <Link key={tag.id} href={`/blog/tag/${tag.id}`}>
+          <Badge
+            variant={activeTagId === tag.id ? 'default' : 'secondary'}
+            className="cursor-pointer hover:bg-primary/90 transition-colors"
+          >
+            {tag.name}
+          </Badge>
         </Link>
       ))}
     </div>

@@ -6,6 +6,14 @@ import { supabase, addTagToPost } from '@/lib/supabase'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import TagInput from '@/components/TagInput'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Switch } from '@/components/ui/switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ArrowLeft, Save, Eye, Edit } from 'lucide-react'
 
 export default function NewPost() {
   const router = useRouter()
@@ -16,7 +24,6 @@ export default function NewPost() {
   const [tags, setTags] = useState<string[]>([])
   const [published, setPublished] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [preview, setPreview] = useState(false)
 
   const handleAddTag = (tag: string) => {
     setTags([...tags, tag])
@@ -72,123 +79,130 @@ export default function NewPost() {
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-slate-900 mb-8">Create New Post</h1>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight">Create New Post</h1>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-2">
-            Title
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={handleTitleChange}
-            placeholder="Post title"
-            required
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Slug */}
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-2">
-            Slug
-          </label>
-          <input
-            type="text"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder="post-slug"
-            required
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Excerpt */}
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-2">
-            Excerpt
-          </label>
-          <textarea
-            value={excerpt}
-            onChange={(e) => setExcerpt(e.target.value)}
-            placeholder="Brief description of the post"
-            rows={2}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* Tag Input */}
-        <TagInput
-          tags={tags}
-          onAddTag={handleAddTag}
-          onRemoveTag={handleRemoveTag}
-        />
-
-        {/* Content Editor */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-slate-900">
-              Content (Markdown)
-            </label>
-            <button
-              type="button"
-              onClick={() => setPreview(!preview)}
-              className="text-sm text-blue-600 hover:text-blue-800"
-            >
-              {preview ? 'Edit' : 'Preview'}
-            </button>
-          </div>
-
-          {!preview ? (
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Write your post in Markdown..."
-              rows={20}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-            />
-          ) : (
-            <div className="border border-slate-300 rounded-lg p-6 bg-white prose prose-sm sm:prose max-w-none min-h-96">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {content}
-              </ReactMarkdown>
+        <Card>
+          <CardHeader>
+            <CardTitle>Post Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={title}
+                onChange={handleTitleChange}
+                placeholder="Enter post title"
+                required
+              />
             </div>
-          )}
-        </div>
 
-        {/* Publish Status */}
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="published"
-            checked={published}
-            onChange={(e) => setPublished(e.target.checked)}
-            className="w-4 h-4"
-          />
-          <label htmlFor="published" className="text-sm font-medium text-slate-900">
-            Publish immediately
-          </label>
-        </div>
+            <div className="grid gap-2">
+              <Label htmlFor="slug">Slug</Label>
+              <Input
+                id="slug"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                placeholder="post-slug"
+                required
+              />
+            </div>
 
-        {/* Actions */}
-        <div className="flex gap-4">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
-          >
-            {saving ? 'Saving...' : 'Create Post'}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="px-6 py-2 border border-slate-300 text-slate-900 rounded-lg hover:bg-slate-50 transition"
-          >
-            Cancel
-          </button>
+            <div className="grid gap-2">
+              <Label htmlFor="excerpt">Excerpt</Label>
+              <Textarea
+                id="excerpt"
+                value={excerpt}
+                onChange={(e) => setExcerpt(e.target.value)}
+                placeholder="Brief description of the post"
+                rows={2}
+              />
+            </div>
+
+            <TagInput
+              tags={tags}
+              onAddTag={handleAddTag}
+              onRemoveTag={handleRemoveTag}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Content</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Tabs defaultValue="edit" className="w-full">
+              <div className="px-6 border-b">
+                <TabsList className="bg-transparent h-auto p-0 gap-4">
+                  <TabsTrigger 
+                    value="edit" 
+                    className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2"
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="preview" 
+                    className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-0 py-2"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+              <TabsContent value="edit" className="m-0 p-0">
+                <Textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Write your post in Markdown..."
+                  className="min-h-[500px] border-none focus-visible:ring-0 rounded-none font-mono text-base p-6 resize-none"
+                />
+              </TabsContent>
+              <TabsContent value="preview" className="m-0 p-6 min-h-[500px]">
+                <div className="prose prose-slate max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {content || "*No content to preview*"}
+                  </ReactMarkdown>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <div className="flex items-center justify-between bg-white p-6 rounded-lg border shadow-sm sticky bottom-8 z-10">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="published"
+              checked={published}
+              onCheckedChange={setPublished}
+            />
+            <Label htmlFor="published">Publish immediately</Label>
+          </div>
+          <div className="flex gap-4">
+            <Button variant="outline" type="button" onClick={() => router.back()}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? (
+                "Saving..."
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Post
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </form>
     </div>

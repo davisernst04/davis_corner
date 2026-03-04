@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { Search as SearchIcon, X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 interface SearchProps {
   onSearch: (query: string) => void
@@ -23,24 +25,26 @@ export default function Search({ onSearch }: SearchProps) {
 
   return (
     <div className="relative max-w-md w-full">
-      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <SearchIcon className="h-5 w-5 text-slate-400" />
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+        <SearchIcon className="h-4 w-4 text-muted-foreground" />
       </div>
-      <input
+      <Input
         type="text"
         value={query}
         onChange={handleChange}
         placeholder="Search posts..."
-        className="block w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        className="pl-9 pr-9"
       />
       {query && (
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={handleClear}
           aria-label="Clear search"
-          className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-slate-600 transition"
+          className="absolute inset-y-0 right-0 h-full px-3 hover:bg-transparent"
         >
-          <X className="h-5 w-5 text-slate-400" />
-        </button>
+          <X className="h-4 w-4 text-muted-foreground" />
+        </Button>
       )}
     </div>
   )

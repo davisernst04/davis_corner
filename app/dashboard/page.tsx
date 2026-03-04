@@ -3,7 +3,35 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { Trash2, Edit2 } from 'lucide-react'
+import { Trash2, Edit2, Plus, MoreVertical, ExternalLink } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 interface BlogPost {
   id: string
@@ -39,8 +67,6 @@ export default function Dashboard() {
   }
 
   async function deletePost(id: string) {
-    if (!confirm('Are you sure you want to delete this post?')) return
-
     try {
       const { error } = await supabase
         .from('blog_posts')
@@ -55,109 +81,132 @@ export default function Dashboard() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Your Posts</h1>
-        <Link
-          href="/dashboard/new"
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          New Post
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Your Posts</h1>
+          <p className="text-muted-foreground mt-1">Manage and publish your blog posts.</p>
+        </div>
+        <Link href="/dashboard/new">
+          <Button className="shadow-sm">
+            <Plus className="mr-2 h-4 w-4" />
+            New Post
+          </Button>
         </Link>
       </div>
 
-      {loading ? (
-        <p className="text-slate-600">Loading posts...</p>
-      ) : posts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-slate-600 mb-4">No posts yet</p>
-          <Link
-            href="/dashboard/new"
-            className="text-blue-600 hover:text-blue-800"
-          >
-            Create your first post
-          </Link>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                  Title
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                  Tags
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {posts.map((post) => (
-                <tr key={post.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <p className="font-medium text-slate-900">{post.title}</p>
-                    <p className="text-sm text-slate-600">{post.slug}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
-                      {post.post_tags?.map(({ tags }) => (
-                        <span
-                          key={tags.name}
-                          className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs"
-                        >
-                          {tags.name}
-                        </span>
-                      ))}
-                      {(!post.post_tags || post.post_tags.length === 0) && (
-                        <span className="text-xs text-slate-400">No tags</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-block px-3 py-1 text-sm rounded-full ${
-                        post.published
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {post.published ? 'Published' : 'Draft'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    {new Date(post.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 flex gap-2">
-                    <Link
-                      href={`/dashboard/edit/${post.id}`}
-                      className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition"
-                    >
-                      <Edit2 size={16} />
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => deletePost(post.id)}
-                      className="inline-flex items-center gap-2 px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
-                    >
-                      <Trash2 size={16} />
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <Card>
+        <CardHeader className="p-0"></CardHeader>
+        <CardContent className="p-0">
+          {loading ? (
+            <div className="p-8 text-center text-muted-foreground">Loading posts...</div>
+          ) : posts.length === 0 ? (
+            <div className="text-center py-24">
+              <p className="text-muted-foreground mb-4">You haven't created any posts yet.</p>
+              <Link href="/dashboard/new">
+                <Button variant="outline">Create your first post</Button>
+              </Link>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">Post</TableHead>
+                  <TableHead>Tags</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {posts.map((post) => (
+                  <TableRow key={post.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-semibold text-slate-900 line-clamp-1">
+                          {post.title}
+                        </div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <Link href={`/blog/${post.slug}`} target="_blank" className="hover:underline flex items-center">
+                            /{post.slug} <ExternalLink className="ml-1 h-3 w-3" />
+                          </Link>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {post.post_tags?.map(({ tags }) => (
+                          <Badge
+                            key={tags.name}
+                            variant="secondary"
+                            className="px-1.5 py-0 text-[10px] font-medium"
+                          >
+                            {tags.name}
+                          </Badge>
+                        ))}
+                        {(!post.post_tags || post.post_tags.length === 0) && (
+                          <span className="text-xs text-muted-foreground italic">None</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={post.published ? 'default' : 'outline'}
+                        className={post.published ? 'bg-emerald-500 hover:bg-emerald-600' : 'text-amber-600 border-amber-200'}
+                      >
+                        {post.published ? 'Published' : 'Draft'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/edit/${post.id}`} className="flex items-center cursor-pointer">
+                              <Edit2 className="mr-2 h-4 w-4" />
+                              Edit
+                            </Link>
+                          </DropdownMenuItem>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will permanently delete "{post.title}". This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deletePost(post.id)} className="bg-red-600 hover:bg-red-700">
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
