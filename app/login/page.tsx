@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -69,7 +69,14 @@ function LoginContent() {
 export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <LoginContent />
+      <Suspense fallback={
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary opacity-50" />
+          <p className="text-xs uppercase tracking-[0.3em] font-bold text-muted-foreground">Initializing...</p>
+        </div>
+      }>
+        <LoginContent />
+      </Suspense>
     </div>
   )
 }
