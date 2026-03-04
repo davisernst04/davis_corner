@@ -8,17 +8,14 @@ import { Loader2 } from 'lucide-react'
 
 function LoginContent() {
   const searchParams = useSearchParams()
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const errorParam = searchParams.get('error')
     if (errorParam === 'Unauthorized') {
       setError('Access denied. Only the administrator account can sign in.')
-      setLoading(false)
     } else if (errorParam) {
       setError(errorParam)
-      setLoading(false)
     } else {
       // Automatically trigger GitHub Login
       handleGithubLogin()
@@ -36,7 +33,6 @@ function LoginContent() {
       if (error) throw error
     } catch (err: any) {
       setError(err.message)
-      setLoading(false)
     }
   }
 
