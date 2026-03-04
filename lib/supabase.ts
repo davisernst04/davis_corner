@@ -1,13 +1,39 @@
 import { createBrowserClient } from '@supabase/auth-helpers-nextjs'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+// Use a getter to ensure we capture environment variables at the right time
+// and avoid returning null which causes "can't access property 'auth'" errors.
+const getSupabase = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-// Only create the client if we have the required environment variables.
-// This prevents build-time crashes when variables aren't provided (e.g., during static generation).
-export const supabase = (supabaseUrl && supabaseAnonKey)
-  ? createBrowserClient(supabaseUrl, supabaseAnonKey)
-  : null as any
+  if (!supabaseUrl || !supabaseAnonKey) {
+    // During build time, Next.js might not have these variables.
+    // We return a proxy that handles property access without crashing immediately,
+    // but throws a clear error if actually used in the browser.
+    if (typeof window !== 'undefined') {
+      console.warn('Supabase variables NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY are missing!')
+    }
+    
+    return new Proxy({} as any, {
+      get(_, prop) {
+        if (prop === 'auth') {
+          return new Proxy({} as any, {
+            get(_, authProp) {
+              return () => {
+                throw new Error(`Supabase Auth method "${String(authProp)}" called but Supabase is not configured. Check your environment variables.`)
+              }
+            }
+          })
+        }
+        return undefined
+      }
+    })
+  }
+
+  return createBrowserClient(supabaseUrl, supabaseAnonKey)
+}
+
+export const supabase = getSupabase()
 
 export async function searchPosts(query: string) {
   const { data, error } = await supabase

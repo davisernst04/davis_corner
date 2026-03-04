@@ -1,26 +1,36 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Github } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
-export default function LoginPage() {
-  const [loading, setLoading] = useState(false)
+function LoginContent() {
+  const searchParams = useSearchParams()
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  async function handleGithubLogin() {
-    setLoading(true)
-    setError(null)
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam === 'Unauthorized') {
+      setError('Access denied. Only the administrator account can sign in.')
+      setLoading(false)
+    } else if (errorParam) {
+      setError(errorParam)
+      setLoading(false)
+    } else {
+      // Automatically trigger GitHub Login
+      handleGithubLogin()
+    }
+  }, [searchParams])
 
+  async function handleGithubLogin() {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       })
       if (error) throw error
@@ -31,45 +41,39 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
-          <CardDescription>
-            Sign in with GitHub to manage your blog.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <Button 
-            variant="outline" 
-            onClick={handleGithubLogin} 
-            disabled={loading}
-            className="w-full py-6 text-lg"
-          >
-            {loading ? (
-              "Connecting..."
-            ) : (
-              <>
-                <Github className="mr-2 h-5 w-5" />
-                Continue with GitHub
-              </>
-            )}
-          </Button>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <Link 
-            href="/" 
-            className="text-sm text-muted-foreground hover:text-primary transition-colors text-center w-full"
-          >
-            ← Back to blog
-          </Link>
-        </CardFooter>
-      </Card>
+    <div className="flex flex-col items-center justify-center space-y-8 max-w-md w-full p-8 bg-card rounded-2xl border border-border shadow-2xl">
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold italic text-primary">Davis' Corner</h1>
+        <p className="text-muted-foreground font-serif">Gatekeeping the dashboard...</p>
+      </div>
+
+      {error ? (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      ) : (
+        <div className="flex flex-col items-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary opacity-50" />
+          <p className="text-xs uppercase tracking-[0.3em] font-bold text-muted-foreground animate-pulse">
+            Authenticating with GitHub
+          </p>
+        </div>
+      )}
+      
+      <button 
+        onClick={() => window.location.href = '/'}
+        className="text-xs uppercase tracking-widest font-bold text-muted-foreground hover:text-primary transition-colors"
+      >
+        ← Abandon mission
+      </button>
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <LoginContent />
     </div>
   )
 }

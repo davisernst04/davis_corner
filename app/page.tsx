@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { supabase, searchPosts, getTags } from '@/lib/supabase'
 import Search from '@/components/Search'
 import TagList from '@/components/TagList'
-import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -75,26 +75,28 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
-            <div>
-              <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Davis' Corner</h1>
-              <p className="mt-2 text-muted-foreground">Thoughts on development, design, and more</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard">
-                <Button variant="outline">Dashboard</Button>
-              </Link>
-            </div>
+      <header className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-3xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-between mb-8">
+            <Link href="/" className="group">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors italic">
+                Davis' Corner
+              </h1>
+              <p className="mt-1 text-sm md:text-base text-muted-foreground font-serif italic">
+                Musings on life, code, and everything in between.
+              </p>
+            </Link>
+            <ThemeToggle />
           </div>
           
-          <div className="flex flex-col gap-6">
+          <div className="space-y-6">
             <Search onSearch={handleSearch} />
-            <div className="flex flex-col gap-3">
-              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Popular Tags</p>
+            <div className="flex flex-col gap-2">
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground/60">
+                Topics of interest
+              </span>
               <TagList tags={tags} />
             </div>
           </div>
@@ -102,72 +104,79 @@ export default function Home() {
       </header>
 
       {/* Blog Posts */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-3xl mx-auto px-6 py-16">
         {loading ? (
-          <div className="grid gap-6">
+          <div className="space-y-12">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="overflow-hidden">
-                <CardHeader className="space-y-2">
-                  <Skeleton className="h-4 w-1/4" />
-                  <Skeleton className="h-8 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-4 w-2/3" />
-                </CardContent>
-              </Card>
+              <div key={i} className="space-y-4">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-20 w-full" />
+              </div>
             ))}
           </div>
         ) : posts.length === 0 ? (
-          <div className="text-center py-24 bg-white rounded-xl border-2 border-dashed border-slate-200">
-            <p className="text-xl text-muted-foreground">No posts found</p>
-            <Button variant="link" onClick={() => fetchPosts()}>Reset search</Button>
+          <div className="text-center py-32 space-y-4 italic">
+            <p className="text-xl text-muted-foreground">The archives are empty...</p>
+            <button 
+              onClick={() => fetchPosts()}
+              className="text-primary hover:underline underline-offset-4 font-bold"
+            >
+              Refresh collection
+            </button>
           </div>
         ) : (
-          <div className="grid gap-8">
+          <div className="space-y-20">
             {posts.map((post) => (
-              <Card key={post.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <div className="flex flex-wrap gap-2 mb-3">
+              <article key={post.id} className="group relative">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap gap-3">
                     {post.post_tags?.map(({ tags }) => (
-                      <Badge key={tags.name} variant="secondary">
+                      <span key={tags.name} className="text-[10px] uppercase tracking-widest font-bold text-primary/70">
                         {tags.name}
-                      </Badge>
+                      </span>
                     ))}
                   </div>
-                  <CardTitle className="text-3xl font-bold leading-tight">
+                  
+                  <Link href={`/blog/${post.slug}`} className="block">
+                    <h2 className="text-2xl md:text-3xl font-bold leading-tight text-foreground group-hover:text-primary transition-colors">
+                      {post.title}
+                    </h2>
+                  </Link>
+                  
+                  <p className="text-muted-foreground leading-relaxed text-lg line-clamp-3 font-serif">
+                    {post.excerpt}
+                  </p>
+                  
+                  <div className="flex items-center justify-between pt-4">
+                    <time className="text-xs uppercase tracking-widest text-muted-foreground/60 font-bold">
+                      {new Date(post.created_at).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </time>
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="hover:text-primary transition-colors"
+                      className="text-sm font-bold text-primary hover:underline underline-offset-4 transition-all"
                     >
-                      {post.title}
+                      Continue reading →
                     </Link>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600 line-clamp-3 text-lg">{post.excerpt}</p>
-                </CardContent>
-                <CardFooter className="flex items-center justify-between border-t border-slate-50 pt-4">
-                  <time className="text-sm text-muted-foreground font-medium uppercase tracking-tighter">
-                    {new Date(post.created_at).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </time>
-                  <Link
-                    href={`/blog/${post.slug}`}
-                  >
-                    <Button variant="ghost" size="sm" className="font-semibold text-primary">
-                      Read more →
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
+                  </div>
+                </div>
+              </article>
             ))}
           </div>
         )}
       </main>
+
+      <footer className="border-t border-border mt-20 py-12 bg-secondary/20">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <p className="text-xs uppercase tracking-[0.3em] font-bold text-muted-foreground/40">
+            © {new Date().getFullYear()} Davis' Corner
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

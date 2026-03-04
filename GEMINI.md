@@ -1,57 +1,83 @@
-# Gemini Project Context: Personal Blog App
+# GEMINI.md - Project Context & Instructions
 
-This project is a modern, personal blog application built with the Next.js 14 App Router, TypeScript, Tailwind CSS, and Supabase for authentication and database management.
+This file serves as the primary instructional context for Gemini CLI when working on the **Davis' Corner** blog application.
 
 ## Project Overview
 
-- **Frontend:** Next.js 14 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS with shadcn/ui components
-- **Backend/Auth:** Supabase (PostgreSQL + GoTrue)
-- **Content:** Markdown-based posts rendered with `react-markdown` and `remark-gfm`
+**Davis' Corner** is a modern, personal blog application built with Next.js 16 and Supabase. It features a public-facing blog with search and tagging capabilities, and a secure admin dashboard for managing content.
 
-The application features a public-facing blog and a protected admin dashboard for managing posts (create, read, update, delete).
+- **Purpose:** Personal blogging, thoughts on development, design, and more.
+- **Main Technologies:**
+    - **Framework:** Next.js 16 (App Router)
+    - **Language:** TypeScript
+    - **Styling:** Tailwind CSS + Shadcn UI
+    - **Backend:** Supabase (PostgreSQL, Auth, RLS)
+    - **Markdown:** React Markdown + GitHub Flavored Markdown
+    - **Icons:** Lucide React
+    - **Forms & Validation:** React Hook Form + Zod
+    - **Testing:** Vitest + React Testing Library
 
-## Architecture
+## Project Structure
 
-- **Public Routes:**
-  - `/`: Home page listing all published posts.
-  - `/blog/[slug]`: Individual post page with Markdown rendering.
-- **Protected Routes (Dashboard):**
-  - `/dashboard`: Management interface for all posts (drafts and published).
-  - `/dashboard/new`: Editor for creating new posts.
-  - `/dashboard/edit/[id]`: Editor for modifying existing posts.
-- **Authentication:**
-  - `/login`: Unified login and signup page.
-  - Auth state is managed via Supabase Auth Helpers.
+```
+/
+├── app/                  # Next.js App Router (Pages, Layouts, API Routes)
+│   ├── auth/             # Auth-related routes (callback)
+│   ├── blog/             # Public blog post pages ([slug])
+│   ├── dashboard/        # Protected admin area (Management, New/Edit Post)
+│   └── login/            # Authentication page
+├── components/           # React Components
+│   ├── ui/               # Shadcn UI base components
+│   └── ...               # Custom application components (Search, TagInput, etc.)
+├── conductor/            # Project Orchestration & Documentation
+│   ├── code_styleguides/ # Language-specific style guides
+│   ├── tracks/           # Feature-specific development tracks
+│   └── index.md          # Entry point for conductor documentation
+├── lib/                  # Shared utilities and client initializations
+│   ├── supabase.ts       # Supabase client and data fetching functions
+│   └── utils.ts          # Tailwind merge and utility functions
+├── supabase/             # Supabase configuration and migrations
+│   └── migrations/       # SQL migration files
+└── ...                   # Configuration files (Next, Tailwind, TS, Vitest, etc.)
+```
 
-## Key Commands
+## Development Workflow
 
-- `npm run dev`: Starts the development server at `http://localhost:3000`.
-- `npm run build`: Builds the application for production.
-- `npm run start`: Runs the built production application.
-- `npm run lint`: Runs ESLint for code quality checks.
+### Conductor System
+The project follows a "Conductor" management pattern. Refer to the `conductor/` directory for high-level project guidance:
+- **Index:** `conductor/index.md`
+- **Product Definition:** `conductor/product.md`
+- **Tech Stack Details:** `conductor/tech-stack.md`
+- **Workflow & Style:** `conductor/workflow.md` and `conductor/code_styleguides/`
+- **Tracks:** `conductor/tracks.md` lists active and completed development tracks.
 
-## Development Conventions
+### Building and Running
+- **Development Server:** `npm run dev`
+- **Build Production:** `npm run build`
+- **Start Production:** `npm run start`
+- **Linting:** `npm run lint`
+- **Testing:** `npm run test`
+- **Coverage:** `npm run coverage`
 
-- **Component Model:** The project primarily uses **Client Components** (`'use client'`) for data fetching and interactivity, leveraging the Supabase client-side SDK.
-- **Styling:** Tailwind CSS is used for all styling. Global styles and Markdown-specific prose styles are defined in `app/globals.css`.
-- **Database:** The primary table is `blog_posts`. Refer to `README.md` or `ARCHITECTURE.md` for the full SQL schema and Row Level Security (RLS) policies.
-- **Authentication Check:** Protected routes are guarded in `app/dashboard/layout.tsx` using a client-side `useEffect` hook that checks for an active Supabase session.
-- **Environment Variables:** Requires `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`.
+### Database Management
+Supabase is used for the backend. Use the Supabase CLI (if available) or the hosted console for management.
+- **Migrations:** Located in `supabase/migrations/`. 
+- **RLS:** Row-Level Security is enabled on all tables. Public access is granted for viewing published posts and tags, while authenticated users (owners) have full CRUD access.
 
-## Key Files
+## Coding Conventions
 
-- `lib/supabase.ts`: Initializes the Supabase browser client.
-- `app/layout.tsx`: Root layout defining metadata and global styles.
-- `app/dashboard/layout.tsx`: Handles authentication logic for the admin area.
-- `app/blog/[slug]/page.tsx`: Renders individual blog posts from Markdown.
-- `app/dashboard/new/page.tsx`: Contains the Markdown editor for post creation.
+- **Next.js:** Prefer Server Components where possible; use `'use client'` selectively for interactivity.
+- **Data Fetching:** Centralized in `lib/supabase.ts` using the Supabase client.
+- **Styling:** Use Tailwind CSS utility classes. Adhere to Shadcn UI patterns for base components.
+- **Types:** Strict TypeScript usage is expected. Use Zod for schema validation (especially for forms).
+- **Testing:** Follow the `*.test.tsx` pattern in the `components/` or `lib/` directory.
 
-## Documentation
+## Key Files & Entry Points
 
-For more detailed information, refer to:
-- `README.md`: General overview and setup instructions.
-- `ARCHITECTURE.md`: Detailed data flow and component structure.
-- `PROJECT_SUMMARY.md`: High-level summary of the project state.
-- `SETUP.md`: Step-by-step installation and configuration guide.
+- `app/page.tsx`: The public homepage listing published posts.
+- `app/dashboard/page.tsx`: The primary entry point for the admin dashboard.
+- `lib/supabase.ts`: Contains the Supabase client instance and core data fetching logic.
+- `app/globals.css`: Global styles including Markdown/Prose styling.
+
+---
+*Note: This file is intended for AI consumption and should be updated as the project's architecture or dependencies evolve.*
