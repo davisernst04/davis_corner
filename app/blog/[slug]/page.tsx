@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -14,7 +15,8 @@ interface BlogPost {
   author_id: string
 }
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
+export default function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = React.use(params)
   const [post, setPost] = useState<BlogPost | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -25,7 +27,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
         const { data, error } = await supabase
           .from('blog_posts')
           .select('*')
-          .eq('slug', params.slug)
+          .eq('slug', slug)
           .eq('published', true)
           .single()
 
@@ -40,7 +42,7 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
     }
 
     fetchPost()
-  }, [params.slug])
+  }, [slug])
 
   if (loading) {
     return (

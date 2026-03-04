@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getPostsByTag, getTags } from '@/lib/supabase'
@@ -15,7 +16,8 @@ interface BlogPost {
   post_tags: { tags: { name: string } }[]
 }
 
-export default function TaggedPosts({ params }: { params: { id: string } }) {
+export default function TaggedPosts({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params)
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [tags, setTags] = useState<any[]>([])
   const [tagName, setTagName] = useState('')
@@ -25,13 +27,13 @@ export default function TaggedPosts({ params }: { params: { id: string } }) {
     fetchTags()
     fetchTaggedPosts()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id])
+  }, [id])
 
   async function fetchTags() {
     try {
       const data = await getTags()
       setTags(data || [])
-      const currentTag = data?.find((t: any) => t.id === params.id)
+      const currentTag = data?.find((t: any) => t.id === id)
       if (currentTag) setTagName(currentTag.name)
     } catch (error) {
       console.error('Error fetching tags:', error)
@@ -41,7 +43,7 @@ export default function TaggedPosts({ params }: { params: { id: string } }) {
   async function fetchTaggedPosts() {
     setLoading(true)
     try {
-      const data = await getPostsByTag(params.id)
+      const data = await getPostsByTag(id)
       // data is from post_tags, each row has blog_posts
       const formattedPosts = data?.map((row: any) => ({
         ...row.blog_posts,
@@ -73,7 +75,7 @@ export default function TaggedPosts({ params }: { params: { id: string } }) {
             </div>
             <div className="flex flex-col gap-2 mt-4">
               <p className="text-sm font-medium text-slate-500">Explore other tags</p>
-              <TagList tags={tags} activeTagId={params.id} />
+              <TagList tags={tags} activeTagId={id} />
             </div>
           </div>
         </div>

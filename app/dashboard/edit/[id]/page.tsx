@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase, getPostTags, addTagToPost, removeTagFromPost } from '@/lib/supabase'
@@ -16,7 +17,8 @@ interface BlogPost {
   published: boolean
 }
 
-export default function EditPost({ params }: { params: { id: string } }) {
+export default function EditPost({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params)
   const router = useRouter()
   const [post, setPost] = useState<BlogPost | null>(null)
   const [loading, setLoading] = useState(true)
@@ -44,7 +46,7 @@ export default function EditPost({ params }: { params: { id: string } }) {
         const { data, error } = await supabase
           .from('blog_posts')
           .select('*')
-          .eq('id', params.id)
+          .eq('id', id)
           .single()
 
         if (error) throw error
@@ -57,7 +59,7 @@ export default function EditPost({ params }: { params: { id: string } }) {
         setPublished(data.published)
 
         // Fetch tags
-        const postTags = await getPostTags(params.id)
+        const postTags = await getPostTags(id)
         setTags(postTags.map((t: any) => t.name))
       } catch (error) {
         console.error('Error fetching post:', error)
@@ -67,7 +69,7 @@ export default function EditPost({ params }: { params: { id: string } }) {
     }
 
     fetchPost()
-  }, [params.id])
+  }, [id])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -83,12 +85,12 @@ export default function EditPost({ params }: { params: { id: string } }) {
           content,
           published,
         })
-        .eq('id', params.id)
+        .eq('id', id)
 
       if (error) throw error
 
       // Update tags
-      const currentTagsData = await getPostTags(params.id)
+      const currentTagsData = await getPostTags(id)
       const currentTagNames = currentTagsData.map((t: any) => t.name)
 
       // Tags to add
@@ -97,8 +99,8 @@ export default function EditPost({ params }: { params: { id: string } }) {
       const tagsToRemove = currentTagsData.filter((t: any) => !tags.includes(t.name))
 
       await Promise.all([
-        ...tagsToAdd.map(tag => addTagToPost(params.id, tag)),
-        ...tagsToRemove.map(tag => removeTagFromPost(params.id, tag.id))
+        ...tagsToAdd.map((tag: string) => addTagToPost(id, tag)),
+        ...tagsToRemove.map((tag: { id: string; name: string }) => removeTagFromPost(id, tag.id))
       ])
 
       router.push('/dashboard')

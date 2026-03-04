@@ -1,9 +1,13 @@
 import { createBrowserClient } from '@supabase/auth-helpers-nextjs'
 
-export const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+// Only create the client if we have the required environment variables.
+// This prevents build-time crashes when variables aren't provided (e.g., during static generation).
+export const supabase = (supabaseUrl && supabaseAnonKey)
+  ? createBrowserClient(supabaseUrl, supabaseAnonKey)
+  : null as any
 
 export async function searchPosts(query: string) {
   const { data, error } = await supabase
@@ -44,7 +48,7 @@ export async function getPostTags(postId: string) {
     .eq('post_id', postId)
 
   if (error) throw error
-  return data?.map(pt => pt.tags) || []
+  return (data as any[])?.map((pt: any) => pt.tags) || []
 }
 
 export async function addTagToPost(postId: string, tagName: string) {
